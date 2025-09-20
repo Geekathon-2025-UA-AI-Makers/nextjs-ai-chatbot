@@ -23,3 +23,6 @@ export const myProvider = customProvider({
     'artifact-model': bedrock('amazon.nova-micro-v1:0'),
   },
 });
+
+// Export bedrock instance for Knowledge Base operations
+export { bedrock };

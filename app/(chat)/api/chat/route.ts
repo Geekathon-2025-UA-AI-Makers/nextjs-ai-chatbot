@@ -7,7 +7,8 @@ import {
   streamText,
 } from 'ai';
 import { auth, type UserType } from '@/app/(auth)/auth';
-import { type RequestHints, systemPrompt } from '@/lib/ai/prompts';
+import { type RequestHints, systemPrompt, type KnowledgeBaseContext } from '@/lib/ai/prompts';
+import { retrieveFromKnowledgeBase } from '@/lib/ai/knowledge-base';
 import {
   createStreamId,
   deleteChatById,
@@ -155,6 +156,29 @@ export async function POST(request: Request) {
       country,
     };
 
+    // Retrieve relevant information from Knowledge Base
+    let knowledgeBaseContext: KnowledgeBaseContext | null = null;
+    try {
+      // Extract the main text content from the user message for Knowledge Base query
+      const userMessageText = message.parts
+        .filter(part => part.type === 'text')
+        .map(part => part.text)
+        .join(' ');
+
+      if (userMessageText.trim()) {
+        knowledgeBaseContext = await retrieveFromKnowledgeBase(userMessageText);
+        console.log('Knowledge Base Context:', knowledgeBaseContext ? 'Found' : 'Not found');
+        if (knowledgeBaseContext) {
+          console.log('KB Content length:', knowledgeBaseContext.content.length);
+          console.log('KB Sources count:', knowledgeBaseContext.sources.length);
+          console.log('KB Content preview:', knowledgeBaseContext.content.substring(0, 300) + '...');
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to retrieve from Knowledge Base:', error);
+      // Continue without Knowledge Base context if retrieval fails
+    }
+
     await saveMessages({
       messages: [
         {
@@ -174,20 +198,16 @@ export async function POST(request: Request) {
 
     const stream = createUIMessageStream({
       execute: ({ writer: dataStream }) => {
+        const systemPromptText = systemPrompt({ selectedChatModel, requestHints, knowledgeBaseContext });
+        console.log('System Prompt Length:', systemPromptText.length);
+        console.log('System Prompt Preview:', systemPromptText.substring(0, 50) + '...');
+
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel, requestHints }),
+          system: systemPromptText,
           messages: convertToModelMessages(uiMessages),
           stopWhen: stepCountIs(5),
-          experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
-              ? []
-              : [
-                  'getWeather',
-                  'createDocument',
-                  'updateDocument',
-                  'requestSuggestions',
-                ],
+          experimental_activeTools: [], // Temporarily disable all tools to test Knowledge Base
           experimental_transform: smoothStream({ chunking: 'word' }),
           tools: {
             getWeather,
