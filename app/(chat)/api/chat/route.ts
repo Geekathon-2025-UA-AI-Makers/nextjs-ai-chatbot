@@ -9,6 +9,7 @@ import {
 import { auth, type UserType } from '@/app/(auth)/auth';
 import { type RequestHints, systemPrompt, type KnowledgeBaseContext } from '@/lib/ai/prompts';
 import { retrieveFromKnowledgeBase } from '@/lib/ai/knowledge-base';
+import { format } from 'date-fns';
 import {
   createStreamId,
   deleteChatById,
@@ -21,10 +22,6 @@ import {
 import { updateChatLastContextById } from '@/lib/db/queries';
 import { convertToUIMessages, generateUUID } from '@/lib/utils';
 import { generateTitleFromUserMessage } from '../../actions';
-import { createDocument } from '@/lib/ai/tools/create-document';
-import { updateDocument } from '@/lib/ai/tools/update-document';
-import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
-import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
@@ -149,11 +146,15 @@ export async function POST(request: Request) {
 
     const { longitude, latitude, city, country } = geolocation(request);
 
+    const now = new Date();
+    const currentDateTime = format(now, 'EEEE, d MMMM HH:mm:ss');
+
     const requestHints: RequestHints = {
       longitude,
       latitude,
       city,
       country,
+      currentDateTime,
     };
 
     // Retrieve relevant information from Knowledge Base
@@ -208,25 +209,8 @@ export async function POST(request: Request) {
           system: systemPromptText,
           messages: convertToModelMessages(uiMessages),
           stopWhen: stepCountIs(5),
-          experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
-              ? []
-              : [
-                  'getWeather',
-                  'createDocument',
-                  'updateDocument',
-                  'requestSuggestions',
-                ],
+          experimental_activeTools: [],
           experimental_transform: smoothStream({ chunking: 'word' }),
-          tools: {
-            getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-            }),
-          },
           experimental_telemetry: {
             isEnabled: isProductionEnvironment,
             functionId: 'stream-text',
