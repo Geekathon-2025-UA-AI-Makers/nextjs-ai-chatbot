@@ -527,35 +527,31 @@ export async function getMessageCountByUserId({
   }
 }
 
-export async function createStreamId({
-  streamId,
-  chatId,
-}: {
-  streamId: string;
-  chatId: string;
-}) {
+export async function createStreamId({ chatId }: { chatId: string }) {
   try {
-    await db
+    const [newStream] = await db
       .insert(stream)
-      .values({ id: streamId, chatId, createdAt: new Date() });
+      .values({
+        chatId,
+        createdAt: new Date(),
+      })
+      .returning({ id: stream.id });
+
+    return newStream.id;
   } catch (error) {
-    throw new ChatSDKError(
-      'bad_request:database',
-      'Failed to create stream id',
-    );
+    throw new ChatSDKError('bad_request:database', 'Failed to create stream id');
   }
 }
 
 export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
   try {
-    const streamIds = await db
+    const streams = await db
       .select({ id: stream.id })
       .from(stream)
       .where(eq(stream.chatId, chatId))
-      .orderBy(asc(stream.createdAt))
-      .execute();
+      .orderBy(asc(stream.createdAt));
 
-    return streamIds.map(({ id }) => id);
+    return streams.map(s => s.id);
   } catch (error) {
     throw new ChatSDKError(
       'bad_request:database',

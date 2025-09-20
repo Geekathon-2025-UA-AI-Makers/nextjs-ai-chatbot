@@ -168,8 +168,7 @@ export async function POST(request: Request) {
       ],
     });
 
-    const streamId = generateUUID();
-    await createStreamId({ streamId, chatId: id });
+    const streamId = await createStreamId({ chatId: id });
 
     let finalMergedUsage: AppUsage | undefined;
 
