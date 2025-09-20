@@ -129,16 +129,12 @@ const PurePreviewMessage = ({
                     <MessageContent
                       data-testid="message-content"
                       className={cn({
-                        'w-fit break-words rounded-2xl px-3 py-2 text-right text-white':
+                        'w-fit break-words rounded-2xl px-3 py-2 text-right text-white bg-[#4a90e2] dark:bg-[#2a2d3a]':
                           message.role === 'user',
                         'bg-transparent px-0 py-0 text-left':
                           message.role === 'assistant',
                       })}
-                      style={
-                        message.role === 'user'
-                          ? { backgroundColor: '#006cff' }
-                          : undefined
-                      }
+
                     >
                       <Response>{part.text}</Response>
                     </MessageContent>
@@ -321,7 +317,7 @@ export const ThinkingMessage = () => {
             <LoadingText>Thinking...</LoadingText>
           </div>
         </div>
-      </div>
+      </div>t
     </motion.div>
   );
 };
