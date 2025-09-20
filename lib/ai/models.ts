@@ -12,4 +12,9 @@ export const chatModels: Array<ChatModel> = [
     name: 'Amazon Nova Micro',
     description: 'Fast and efficient AI model powered by Amazon Bedrock',
   },
+  {
+    id: 'chat-model-reasoning',
+    name: 'Amazon Nova Micro (Reasoning)',
+    description: 'AI model with reasoning capabilities - shows thinking process',
+  },
 ];

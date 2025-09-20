@@ -7,7 +7,9 @@ import {
   streamText,
 } from 'ai';
 import { auth, type UserType } from '@/app/(auth)/auth';
-import { type RequestHints, systemPrompt } from '@/lib/ai/prompts';
+import { type RequestHints, systemPrompt, type KnowledgeBaseContext } from '@/lib/ai/prompts';
+import { retrieveFromKnowledgeBase } from '@/lib/ai/knowledge-base';
+import { format } from 'date-fns';
 import {
   createStreamId,
   deleteChatById,
@@ -20,10 +22,6 @@ import {
 import { updateChatLastContextById } from '@/lib/db/queries';
 import { convertToUIMessages, generateUUID } from '@/lib/utils';
 import { generateTitleFromUserMessage } from '../../actions';
-import { createDocument } from '@/lib/ai/tools/create-document';
-import { updateDocument } from '@/lib/ai/tools/update-document';
-import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
-import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
@@ -148,12 +146,39 @@ export async function POST(request: Request) {
 
     const { longitude, latitude, city, country } = geolocation(request);
 
+    const now = new Date();
+    const currentDateTime = format(now, 'EEEE, d MMMM HH:mm:ss');
+
     const requestHints: RequestHints = {
       longitude,
       latitude,
       city,
       country,
+      currentDateTime,
     };
+
+    // Retrieve relevant information from Knowledge Base
+    let knowledgeBaseContext: KnowledgeBaseContext | null = null;
+    try {
+      // Extract the main text content from the user message for Knowledge Base query
+      const userMessageText = message.parts
+        .filter(part => part.type === 'text')
+        .map(part => part.text)
+        .join(' ');
+
+      if (userMessageText.trim()) {
+        knowledgeBaseContext = await retrieveFromKnowledgeBase(userMessageText);
+        console.log('Knowledge Base Context:', knowledgeBaseContext ? 'Found' : 'Not found');
+        if (knowledgeBaseContext) {
+          console.log('KB Content length:', knowledgeBaseContext.content.length);
+          console.log('KB Sources count:', knowledgeBaseContext.sources.length);
+          console.log('KB Content preview:', knowledgeBaseContext.content.substring(0, 300) + '...');
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to retrieve from Knowledge Base:', error);
+      // Continue without Knowledge Base context if retrieval fails
+    }
 
     await saveMessages({
       messages: [
@@ -174,30 +199,18 @@ export async function POST(request: Request) {
 
     const stream = createUIMessageStream({
       execute: ({ writer: dataStream }) => {
+        const systemPromptText = systemPrompt({ selectedChatModel, requestHints, knowledgeBaseContext });
+        console.log('Selected Chat Model:', selectedChatModel);
+        console.log('System Prompt Length:', systemPromptText.length);
+        console.log('System Prompt Preview:', systemPromptText.substring(0, 200) + '...');
+
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel, requestHints }),
+          system: systemPromptText,
           messages: convertToModelMessages(uiMessages),
           stopWhen: stepCountIs(5),
-          experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
-              ? []
-              : [
-                  'getWeather',
-                  'createDocument',
-                  'updateDocument',
-                  'requestSuggestions',
-                ],
+          experimental_activeTools: [],
           experimental_transform: smoothStream({ chunking: 'word' }),
-          tools: {
-            getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-            }),
-          },
           experimental_telemetry: {
             isEnabled: isProductionEnvironment,
             functionId: 'stream-text',

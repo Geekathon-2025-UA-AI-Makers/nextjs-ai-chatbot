@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { PalmtreeIcon } from 'lucide-react';
 
 export function AppSidebar({ user }: { user: User | undefined }) {
   const router = useRouter();
@@ -32,11 +33,10 @@ export function AppSidebar({ user }: { user: User | undefined }) {
               onClick={() => {
                 setOpenMobile(false);
               }}
-              className="flex flex-row items-center gap-3"
+              className="flex flex-row items--flex-end  hover:bg-muted px-3 py-2 gap-1.5 rounded-md cursor-pointer font-semibold text-lg"
             >
-              <span className="cursor-pointer rounded-md px-2 font-semibold text-lg hover:bg-muted">
-                Chatbot
-              </span>
+              <PalmtreeIcon />
+              <span>prAIas</span>
             </Link>
             <Tooltip>
               <TooltipTrigger asChild>

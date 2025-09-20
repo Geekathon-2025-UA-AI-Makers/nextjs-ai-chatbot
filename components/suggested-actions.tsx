@@ -19,10 +19,10 @@ function PureSuggestedActions({
   selectedVisibilityType,
 }: SuggestedActionsProps) {
   const suggestedActions = [
-    'What are the advantages of using Next.js?',
-    "Write code to demonstrate Dijkstra's algorithm",
-    'Help me write an essay about Silicon Valley',
-    'What is the weather in San Francisco?',
+    'I want to visit Praia Grande tomorrow morning. Will there be space to park?',
+    "Should I go to Praia Azul this evening, or is there a better option?",
+    'Is it a good idea to drive to Praia da Torre now?',
+    'Can I find parking at Praia de Carcavelos around 3 PM today?',
   ];
 
   return (

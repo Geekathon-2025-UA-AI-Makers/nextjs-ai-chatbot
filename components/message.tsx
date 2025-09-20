@@ -129,18 +129,14 @@ const PurePreviewMessage = ({
                     <MessageContent
                       data-testid="message-content"
                       className={cn({
-                        'w-fit break-words rounded-2xl px-3 py-2 text-right text-white':
+                        'w-fit break-words rounded-2xl px-3 py-2 text-right text-white bg-[#4a90e2] dark:bg-[#2a2d3a]':
                           message.role === 'user',
                         'bg-transparent px-0 py-0 text-left':
                           message.role === 'assistant',
                       })}
-                      style={
-                        message.role === 'user'
-                          ? { backgroundColor: '#006cff' }
-                          : undefined
-                      }
+
                     >
-                      <Response>{sanitizeText(part.text)}</Response>
+                      <Response>{part.text}</Response>
                     </MessageContent>
                   </div>
                 );
@@ -321,7 +317,7 @@ export const ThinkingMessage = () => {
             <LoadingText>Thinking...</LoadingText>
           </div>
         </div>
-      </div>
+      </div>t
     </motion.div>
   );
 };
@@ -336,6 +332,7 @@ const LoadingText = ({ children }: { children: React.ReactNode }) => {
         ease: 'linear',
       }}
       style={{
+        color: "hsl(var(--muted-foreground))",
         background:
           'linear-gradient(90deg, hsl(var(--muted-foreground)) 0%, hsl(var(--muted-foreground)) 35%, hsl(var(--foreground)) 50%, hsl(var(--muted-foreground)) 65%, hsl(var(--muted-foreground)) 100%)',
         backgroundSize: '200% 100%',
