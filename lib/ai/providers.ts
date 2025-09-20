@@ -17,7 +17,7 @@ export const myProvider = customProvider({
     'chat-model': bedrock('amazon.nova-micro-v1:0'),
     'chat-model-reasoning': wrapLanguageModel({
       model: bedrock('amazon.nova-micro-v1:0'),
-      middleware: extractReasoningMiddleware({ tagName: 'think' }),
+      middleware: extractReasoningMiddleware({ tagName: 'thinking' }),
     }),
     'title-model': bedrock('amazon.nova-micro-v1:0'),
     'artifact-model': bedrock('amazon.nova-micro-v1:0'),

@@ -140,7 +140,7 @@ const PurePreviewMessage = ({
                           : undefined
                       }
                     >
-                      <Response>{sanitizeText(part.text)}</Response>
+                      <Response>{part.text}</Response>
                     </MessageContent>
                   </div>
                 );
@@ -336,6 +336,7 @@ const LoadingText = ({ children }: { children: React.ReactNode }) => {
         ease: 'linear',
       }}
       style={{
+        color: "hsl(var(--muted-foreground))",
         background:
           'linear-gradient(90deg, hsl(var(--muted-foreground)) 0%, hsl(var(--muted-foreground)) 35%, hsl(var(--foreground)) 50%, hsl(var(--muted-foreground)) 65%, hsl(var(--muted-foreground)) 100%)',
         backgroundSize: '200% 100%',

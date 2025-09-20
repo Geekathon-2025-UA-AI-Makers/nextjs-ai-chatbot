@@ -199,15 +199,24 @@ export async function POST(request: Request) {
     const stream = createUIMessageStream({
       execute: ({ writer: dataStream }) => {
         const systemPromptText = systemPrompt({ selectedChatModel, requestHints, knowledgeBaseContext });
+        console.log('Selected Chat Model:', selectedChatModel);
         console.log('System Prompt Length:', systemPromptText.length);
-        console.log('System Prompt Preview:', systemPromptText.substring(0, 50) + '...');
+        console.log('System Prompt Preview:', systemPromptText.substring(0, 200) + '...');
 
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
           system: systemPromptText,
           messages: convertToModelMessages(uiMessages),
           stopWhen: stepCountIs(5),
-          experimental_activeTools: [], // Temporarily disable all tools to test Knowledge Base
+          experimental_activeTools:
+            selectedChatModel === 'chat-model-reasoning'
+              ? []
+              : [
+                  'getWeather',
+                  'createDocument',
+                  'updateDocument',
+                  'requestSuggestions',
+                ],
           experimental_transform: smoothStream({ chunking: 'word' }),
           tools: {
             getWeather,

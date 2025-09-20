@@ -6,7 +6,6 @@ import {
   ReasoningTrigger,
   ReasoningContent,
 } from './elements/reasoning';
-import { sanitizeText } from '@/lib/utils';
 
 interface MessageReasoningProps {
   isLoading: boolean;
@@ -32,7 +31,7 @@ export function MessageReasoning({
       data-testid="message-reasoning"
     >
       <ReasoningTrigger />
-      <ReasoningContent>{sanitizeText(reasoning)}</ReasoningContent>
+      <ReasoningContent>{reasoning}</ReasoningContent>
     </Reasoning>
   );
 }
