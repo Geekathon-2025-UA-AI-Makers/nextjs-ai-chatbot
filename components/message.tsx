@@ -317,7 +317,7 @@ export const ThinkingMessage = () => {
             <LoadingText>Thinking...</LoadingText>
           </div>
         </div>
-      </div>t
+      </div>
     </motion.div>
   );
 };
