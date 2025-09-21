@@ -47,7 +47,7 @@ function PureMessages({
   useDataStream();
 
   useEffect(() => {
-    if (status === 'submitted') {
+    if (status === 'submitted' || status === 'streaming') {
       requestAnimationFrame(() => {
         const container = messagesContainerRef.current;
         if (container) {
@@ -59,6 +59,21 @@ function PureMessages({
       });
     }
   }, [status, messagesContainerRef]);
+
+  // Auto-scroll when messages change (for streaming updates)
+  useEffect(() => {
+    if (messages.length > 0 && (status === 'streaming' || status === 'submitted')) {
+      requestAnimationFrame(() => {
+        const container = messagesContainerRef.current;
+        if (container) {
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          });
+        }
+      });
+    }
+  }, [messages, status, messagesContainerRef]);
 
   return (
     <div
@@ -107,7 +122,7 @@ function PureMessages({
 
       {!isAtBottom && (
         <button
-          className="-translate-x-1/2 absolute bottom-40 left-1/2 z-10 rounded-full border bg-background p-2 shadow-lg transition-colors hover:bg-muted"
+          className="-translate-x-1/2 absolute bottom-5 left-1/2 z-10 rounded-full border bg-background p-2 shadow-lg transition-colors hover:bg-muted"
           onClick={() => scrollToBottom('smooth')}
           type="button"
           aria-label="Scroll to bottom"
