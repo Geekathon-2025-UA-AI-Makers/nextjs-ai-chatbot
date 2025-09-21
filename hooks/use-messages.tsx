@@ -27,6 +27,15 @@ export function useMessages({
     }
   }, [status]);
 
+  // Auto-scroll when status changes to streaming or submitted
+  useEffect(() => {
+    if (status === 'streaming' || status === 'submitted') {
+      requestAnimationFrame(() => {
+        scrollToBottom('smooth');
+      });
+    }
+  }, [status, scrollToBottom]);
+
   return {
     containerRef,
     endRef,
