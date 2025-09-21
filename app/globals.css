@@ -89,6 +89,7 @@
 @theme {
   --font-sans: var(--font-geist);
   --font-mono: var(--font-geist-mono);
+  --font-tinos: var(--font-tinos);
 
   --breakpoint-toast-mobile: 600px;
 
