@@ -38,6 +38,24 @@ This transforms chaotic parking searches into informed, efficient trips while su
 - Inclusivity and accessibility attribution
 - Explore low cost solar bluetooth sensors (e.g. LoRaWAN)
 
+## 🚀 How to Use
+
+Start a conversation with the chatbot (via web, mobile, or integrated app).
+
+Ask a question in natural language, for example:
+
+“Will there be parking at São Pedro de Moel at 5 PM?”
+
+“I want to go to the beach in 1 hour, will I find a spot?”
+
+The chatbot will:
+
+Show the current occupancy.
+
+Calculate the probability of finding a space at your requested time.
+
+Suggest an alternative nearby beach if parking is likely full.
+
 ## Technical Implementation
 
 ### Features

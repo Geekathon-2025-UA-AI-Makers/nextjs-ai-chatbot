@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+  import { motion } from 'framer-motion';
 
 export const Greeting = () => {
   return (
@@ -13,7 +13,7 @@ export const Greeting = () => {
         transition={{ delay: 0.5 }}
         className="font-semibold text-xl md:text-2xl"
       >
-        Hello there!
+        Hey! 🏖️
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -22,7 +22,7 @@ export const Greeting = () => {
         transition={{ delay: 0.6 }}
         className="text-xl text-zinc-500 md:text-2xl"
       >
-        How can I help you today?
+        Looking for the best beach and parking today? Just share the beach name and when you plan to arrive.
       </motion.div>
     </div>
   );
